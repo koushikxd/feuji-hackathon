@@ -8,13 +8,17 @@
  * @module
  */
 
+import type * as runs from "../runs.js";
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
 
-declare const fullApi: ApiFromModules<{}>;
+declare const fullApi: ApiFromModules<{
+  runs: typeof runs;
+}>;
 
 /**
  * A utility for referencing Convex functions in your app's public API.

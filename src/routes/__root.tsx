@@ -1,6 +1,12 @@
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
+import {
+  HeadContent,
+  Scripts,
+  createRootRoute,
+} from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
+import { AppProviders } from "@/components/app-providers"
+import { AppSidebar, SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { env } from "~/env"
@@ -38,7 +44,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Shard",
       },
     ],
     links: [
@@ -60,22 +66,44 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ThemeProvider>
-          <div className="fixed top-4 right-4">
-            <ThemeToggle />
-          </div>
-          {children}
-          <TanStackDevtools
-            config={{
-              position: "bottom-right",
-            }}
-            plugins={[
-              {
-                name: "Tanstack Router",
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
-          <Scripts />
+          <AppProviders>
+            <SidebarProvider defaultOpen>
+              <AppSidebar />
+              <SidebarInset className="min-h-svh">
+                <header className="sticky top-0 z-20 border-b border-border/70 bg-background/95 backdrop-blur">
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 md:px-6">
+                    <div className="flex items-center gap-3">
+                      <SidebarTrigger />
+                      <div>
+                        <div className="text-[0.7rem] font-medium tracking-[0.28em] text-muted-foreground uppercase">
+                          Shard
+                        </div>
+                        <p className="text-sm text-foreground">
+                          Autonomous QA runs and review workflows
+                        </p>
+                      </div>
+                    </div>
+                    <ThemeToggle />
+                  </div>
+                </header>
+                <div className="flex-1 px-4 py-4 md:px-6 md:py-6">
+                  {children}
+                </div>
+              </SidebarInset>
+            </SidebarProvider>
+            <TanStackDevtools
+              config={{
+                position: "bottom-right",
+              }}
+              plugins={[
+                {
+                  name: "Tanstack Router",
+                  render: <TanStackRouterDevtoolsPanel />,
+                },
+              ]}
+            />
+            <Scripts />
+          </AppProviders>
         </ThemeProvider>
       </body>
     </html>

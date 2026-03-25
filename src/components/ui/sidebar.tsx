@@ -2,6 +2,14 @@ import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Link, useRouterState } from "@tanstack/react-router"
+import {
+  IconHistory,
+  IconHome2,
+  IconLayoutDashboard,
+  IconMessage2Bolt,
+  IconSparkles,
+} from "@tabler/icons-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -693,7 +701,92 @@ function SidebarMenuSubButton({
   })
 }
 
+const appNavigation = [
+  {
+    title: "Home",
+    to: "/" as const,
+    icon: IconHome2,
+  },
+  {
+    title: "Dashboard",
+    to: "/dashboard" as const,
+    icon: IconLayoutDashboard,
+  },
+  {
+    title: "Review Bot",
+    to: "/review-bot" as const,
+    icon: IconMessage2Bolt,
+  },
+  {
+    title: "History",
+    to: "/history" as const,
+    icon: IconHistory,
+  },
+]
+
+function AppSidebar() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+
+  return (
+    <Sidebar collapsible="icon" variant="inset">
+      <SidebarHeader className="gap-3 p-3">
+        <div className="flex items-center gap-3 rounded-2xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-3">
+          <div className="flex size-10 items-center justify-center rounded-2xl bg-sidebar-primary text-sidebar-primary-foreground">
+            <IconSparkles className="size-4" />
+          </div>
+          <div className="min-w-0 group-data-[collapsible=icon]:hidden">
+            <div className="text-[0.7rem] font-medium tracking-[0.28em] text-sidebar-foreground/60 uppercase">
+              Shard
+            </div>
+            <p className="truncate text-sm text-sidebar-foreground">
+              QA command center
+            </p>
+          </div>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {appNavigation.map((item) => {
+                const isActive =
+                  item.to === "/"
+                    ? pathname === item.to
+                    : pathname === item.to || pathname.startsWith(`${item.to}/`)
+
+                return (
+                  <SidebarMenuItem key={item.to}>
+                    <SidebarMenuButton
+                      render={<Link to={item.to} />}
+                      isActive={isActive}
+                      tooltip={item.title}
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter className="p-3">
+        <div className="rounded-2xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-3 text-xs leading-5 text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
+          Run creation lives on Home. The other sections are staged placeholders
+          for the next product loops.
+        </div>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  )
+}
+
 export {
+  AppSidebar,
   Sidebar,
   SidebarContent,
   SidebarFooter,

@@ -24,7 +24,7 @@
 
 ## 3. Browser runtime with Steel.dev Cloud
 
-- Use Steel.dev Cloud for browser sessions instead of local Docker Steel.
+- Use Steel.dev Cloud for browser sessions.
 - Create a session for each QA run and connect Playwright to Steel over CDP.
 - Save session id, replay link, and browser status in Convex.
 - Verify these flows work:
