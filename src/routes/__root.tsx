@@ -1,8 +1,11 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
+import { env } from "~/env"
 
 import appCss from "../styles.css?url"
+
+void env.VITE_CONVEX_URL
 
 export const Route = createRootRoute({
   head: () => ({

@@ -18,6 +18,7 @@
     "@convex-dev/react-query": "^0.1.0",
     "@faker-js/faker": "^10.4.0",
     "@fontsource-variable/instrument-sans": "^5.2.8",
+    "@t3-oss/env-core": "^0.13.11",
     "@tabler/icons-react": "^3.40.0",
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-devtools": "^0.10.0",
