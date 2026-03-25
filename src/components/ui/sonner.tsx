@@ -1,6 +1,12 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { IconCircleCheck, IconInfoCircle, IconAlertTriangle, IconAlertOctagon, IconLoader } from "@tabler/icons-react"
+import {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconInfoCircle,
+  IconLoader2,
+} from "@tabler/icons-react"
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
@@ -20,10 +26,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
           <IconAlertTriangle className="size-4" />
         ),
         error: (
-          <IconAlertOctagon className="size-4" />
+          <IconAlertCircle className="size-4" />
         ),
         loading: (
-          <IconLoader className="size-4 animate-spin" />
+          <IconLoader2 className="size-4 animate-spin" />
         ),
       }}
       style={
