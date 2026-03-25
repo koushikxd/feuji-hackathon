@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { useConvexMutation } from "@convex-dev/react-query"
 import { useMutation } from "@tanstack/react-query"
 import { IconArrowRight, IconWorldWww } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
-import { api } from "../../convex/_generated/api"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,6 +16,8 @@ import {
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/ui/prompt-input"
+import { createRun } from "@/lib/create-run"
+import { validateRunUrl } from "@/lib/run-url"
 
 export const Route = createFileRoute("/")({ component: App })
 
@@ -25,9 +25,8 @@ function App() {
   const navigate = Route.useNavigate()
   const [url, setUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const createRunMutation = useConvexMutation(api.runs.createRun)
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: createRunMutation,
+    mutationFn: createRun,
   })
 
   const normalizedUrl = useMemo(() => url.trim(), [url])
@@ -41,7 +40,7 @@ function App() {
 
     setError(null)
 
-    const runId = await mutateAsync({ url: validatedUrl })
+    const { runId } = await mutateAsync({ data: { url: validatedUrl } })
     void navigate({ to: "/runs/$runId", params: { runId } })
   }
 
@@ -146,20 +145,4 @@ function FeatureLine({ title, body }: { title: string; body: string }) {
       <p className="mt-1 leading-6">{body}</p>
     </div>
   )
-}
-
-function validateRunUrl(value: string) {
-  if (!value) {
-    return null
-  }
-
-  try {
-    const parsed = new URL(value)
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-      return null
-    }
-    return parsed.toString()
-  } catch {
-    return null
-  }
 }

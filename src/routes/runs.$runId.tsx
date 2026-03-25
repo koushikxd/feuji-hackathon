@@ -5,6 +5,7 @@ import { formatDistanceToNow } from "date-fns"
 import type { Id } from "../../convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api"
 import { Badge } from "@/components/ui/badge"
+import { buttonVariants } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -19,7 +20,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import { IconBolt, IconCircleX, IconPhoto, IconSearch } from "@tabler/icons-react"
+import { IconBolt, IconCircleX, IconExternalLink, IconPhoto, IconSearch } from "@tabler/icons-react"
 
 export const Route = createFileRoute("/runs/$runId")({
   component: RunPage,
@@ -27,11 +28,14 @@ export const Route = createFileRoute("/runs/$runId")({
 
 function RunPage() {
   const { runId } = Route.useParams()
-  const { data: run } = useQuery(
-    convexQuery(api.runs.getRun, { runId: runId as Id<"runs"> })
+  const { data: report } = useQuery(
+    convexQuery(api.runtime.getRunReport, { runId: runId as Id<"runs"> })
   )
+  const run = report?.run
+  const session = report?.session
+  const screenshot = report?.artifacts.find((artifact) => artifact.type === "screenshot")
 
-  if (run === null) {
+  if (report === null) {
     return (
       <Empty className="min-h-[calc(100svh-12rem)] border border-dashed border-border/70 bg-card/60">
         <EmptyHeader>
@@ -47,7 +51,7 @@ function RunPage() {
     )
   }
 
-  if (!run) {
+  if (!report || !run) {
     return (
       <div className="grid gap-4 lg:grid-cols-[1.4fr_0.9fr]">
         <Card className="min-h-64 border border-border/70 bg-card/70" />
@@ -78,6 +82,10 @@ function RunPage() {
             value={run.currentStep ?? "Waiting for orchestration"}
           />
           <Metric
+            label="Browser Session"
+            value={session?.status ?? "Not started"}
+          />
+          <Metric
             label="Started"
             value={formatDistanceToNow(run.startedAt, { addSuffix: true })}
           />
@@ -89,15 +97,20 @@ function RunPage() {
       </Card>
 
       <div className="grid gap-4">
-        <PlaceholderCard
+        <InfoCard
           icon={<IconSearch className="size-4" />}
-          title="Findings"
-          description="No findings yet. This panel will populate as browser, perf, and hygiene checks start writing data."
+          title="Runtime status"
+          description={
+            run.errorMessage ??
+            "No findings yet. This milestone only proves the background browser runtime and artifact flow."
+          }
+          accent={run.errorMessage ? "destructive" : "default"}
         />
-        <PlaceholderCard
+        <ArtifactCard
           icon={<IconPhoto className="size-4" />}
           title="Artifacts"
-          description="Screenshots, traces, and replay links will appear here once the runtime is connected."
+          screenshotUrl={screenshot?.url}
+          replayUrl={session?.replayUrl}
         />
       </div>
 
@@ -115,6 +128,10 @@ function RunPage() {
         <CardContent className="pt-4">
           <dl className="grid gap-3 text-sm md:grid-cols-2">
             <StatusRow label="Status" value={run.status} />
+            <StatusRow
+              label="Steel replay"
+              value={session?.replayUrl ?? "Not available"}
+            />
             <StatusRow
               label="Final score"
               value={run.finalScore?.toString() ?? "Not computed"}
@@ -146,11 +163,13 @@ function Metric({ label, value }: { label: string; value: string }) {
   )
 }
 
-function PlaceholderCard({
+function InfoCard({
   icon,
   title,
   description,
+  accent = "default",
 }: {
+  accent?: "default" | "destructive"
   icon: React.ReactNode
   title: string
   description: string
@@ -162,8 +181,65 @@ function PlaceholderCard({
           {icon}
           {title}
         </CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription
+          className={accent === "destructive" ? "text-destructive" : undefined}
+        >
+          {description}
+        </CardDescription>
       </CardHeader>
+    </Card>
+  )
+}
+
+function ArtifactCard({
+  icon,
+  title,
+  screenshotUrl,
+  replayUrl,
+}: {
+  icon: React.ReactNode
+  replayUrl?: string
+  screenshotUrl?: string | null
+  title: string
+}) {
+  return (
+    <Card className="overflow-hidden border border-border/70 bg-card/80">
+      <CardHeader className="gap-3 border-b border-border/70">
+        <CardTitle className="flex items-center gap-2 text-base">
+          {icon}
+          {title}
+        </CardTitle>
+        <CardDescription>
+          The smoke run stores the first screenshot in Convex and links the Steel replay when available.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 pt-4">
+        {screenshotUrl ? (
+          <img
+            alt="Run screenshot"
+            src={screenshotUrl}
+            className="w-full rounded-2xl border border-border/70 bg-background object-cover"
+          />
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border/70 bg-background/70 p-4 text-sm text-muted-foreground">
+            Screenshot is not available yet.
+          </div>
+        )}
+        {replayUrl ? (
+          <a
+            href={replayUrl}
+            target="_blank"
+            rel="noreferrer"
+            className={buttonVariants({
+              variant: "outline",
+              className: "w-full justify-between rounded-2xl",
+            })}
+          >
+            Open Steel replay
+            <IconExternalLink className="size-4" />
+          </a>
+        ) : null}
+      </CardContent>
     </Card>
   )
 }

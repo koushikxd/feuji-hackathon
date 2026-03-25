@@ -51,6 +51,7 @@ export default defineSchema({
     url: v.string(),
     status: runStatus,
     currentStep: v.optional(v.string()),
+    errorMessage: v.optional(v.string()),
     startedAt: v.number(),
     updatedAt: v.number(),
     finishedAt: v.optional(v.number()),
@@ -86,7 +87,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_run", ["runId"])
-    .index("by_run_and_type", ["runId", "type"]),
+    .index("by_run_and_type", ["runId", "type"])
+    .index("by_run_and_created_at", ["runId", "createdAt"]),
 
   prReviews: defineTable({
     repo: v.string(),
@@ -110,8 +112,10 @@ export default defineSchema({
     status: sessionStatus,
     replayUrl: v.optional(v.string()),
     startedAt: v.number(),
+    updatedAt: v.number(),
     finishedAt: v.optional(v.number()),
   })
     .index("by_run", ["runId"])
-    .index("by_external_session_id", ["externalSessionId"]),
+    .index("by_external_session_id", ["externalSessionId"])
+    .index("by_run_and_started_at", ["runId", "startedAt"]),
 })

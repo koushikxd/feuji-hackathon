@@ -9,6 +9,7 @@
  */
 
 import type * as runs from "../runs.js";
+import type * as runtime from "../runtime.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +19,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   runs: typeof runs;
+  runtime: typeof runtime;
 }>;
 
 /**
